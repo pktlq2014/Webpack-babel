@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const WebpackManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // tách các thư viện ra thành vendor.js giúp tăng performance
@@ -17,7 +18,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const config = {
     // đang code thì dùng development -> release dự án thì dùng production
     mode: 'development', // // lệnh này sẽ làm cho webpack thông báo lỗi sẽ đến từ file nào luôn chứ không để lỗi ở bundle nữa hoặc dùng devtool: 'inline-source-map',
-    watch: true,
+    // watch: true, // thằng này giúp tự động lắng nghe và cập nhật sự thay đổi nhưng gì dùng devServer rồi không cần dùng nó nữa
     // entry: './src/index.tsx', // điểm bắt đầu
     entry: {
         // chỗ này có thể thêm nhiều điểm bắt đầu và gộp nó lại trong file bundle
@@ -61,15 +62,18 @@ const config = {
                 ],
                 // test là tìm những file có đuôi là gì đó
                 test: /\.(ts|js)x?$/, // tìm hết các file có đuôi là .js (dấu $ là kết thúc, nghĩa là những file kết thúc có đuôi là .js)
-                // exclude: '/(node_modules|bower_components)/' // không load folder node_modules giúp tăng tốc độ vì folder này rất nặng
-                exclude: '/node_modules/', // không load folder node_modules giúp tăng tốc độ vì folder này rất nặng
+                exclude: '/(node_modules|bower_components)/' // không load folder node_modules giúp tăng tốc độ vì folder này rất nặng
+                //exclude: '/node_modules/', // không load folder node_modules giúp tăng tốc độ vì folder này rất nặng
             },
             // tách file .css ra ngoài bundle.js
             {
                 // test là tìm những file có đuôi là gì đó
-                test: /\.css$/,
+                // test: /\.css$/,
+                test: /\.scss$/,
+                // test: /\.(css|scss)x?$/,
                 // tất cả các file .css sử dụng style-loader và css-loader
-                use: ['style-loader', 'css-loader']
+                // import 2 thằng này vào mới nhận được css import ở component
+                use: ['style-loader', 'css-loader', 'sass-loader']
                 // use: [
                 //     {
                 //         loader: MiniCssExtractPlugin.loader,
@@ -94,12 +98,17 @@ const config = {
     },
     // devtool: 'cheap-module-eval-source-map',
     // devtool: 'inline-source-map', 
-    devServer: { // thằng này chỉ dùng cho lệnh npm run dev -> mà đang bị lỗi
+    devServer: { // thằng này chỉ dùng cho lệnh npm run serve 
         //contentBase: path.join(__dirname, 'dist'), // đổi ở file bundle tại folder dist
-        contentBase: './dist', // đổi ở file bundle tại folder dist // này giống extention live server
+        // contentBase: '/',
+        // disableHostCheck: true,
+        // historyApiFallback: true,
+        // overlay: true,
+        // stats: 'minimal',
+        // inline: true,
         open: true, // giống live server tự động mở trình duyệt mới
-        // compress: true,
-        // port: 9000, // đổi port sang 9000 nếu muốn
+        compress: true,
+        port: 9001, // đổi port sang 9000 nếu muốn
     },
     // optimization này giúp giảm dung lượng khi sử dụng thư viện thứ 3
     // VD: khi sử dung lodash, mỗi component khai báo 1 lần
@@ -135,6 +144,8 @@ const config = {
         // names: ['vendor', 'manifest'],
         //     filename: 'vendor.js',
         // }),
+        // MiniCssExtractPlugin.loader,
+        // new WebpackManifestPlugin({}),
         new MiniCssExtractPlugin({
             filename: "[name].css",
         }),
