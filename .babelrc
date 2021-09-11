@@ -2,11 +2,13 @@
   "presets": [
     "@babel/preset-env",
     [
+      // lệnh này dùng để hiểu code jsx của react
       "@babel/preset-react",
       {
         "runtime": "automatic"
       }
     ],
+    // lệnh này dùng để hiểu code typescript
     "@babel/preset-typescript"
   ]
 }
